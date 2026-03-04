@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\LocationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,3 +26,4 @@ Route::get('/health', function (){
         'time'=>now()->toDateTimeString()
     ]);
 });
+Route::apiResource('locations', LocationController::class);
