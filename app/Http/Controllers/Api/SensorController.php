@@ -14,21 +14,14 @@ class SensorController extends Controller
     public function index(Request $request)
     {
         $perPage = (int) $request->query('per_page', 10);
-        $locationId = $request->query('location_id');
-        $status = $request->query('status');
-        $q = $request->query('q'); // search
+
+        $filters = $request->only(['location_id', 'status']);
 
         $sensors = Sensor::query()
-            ->with('location') // eager load
-            ->when($locationId, fn($query) => $query->where('location_id', $locationId))
-            ->when($status, fn($query) => $query->where('status', $status))
-            ->when($q, function ($query) use ($q) {
-                $query->where(function ($qq) use ($q) {
-                    $qq->where('name', 'like', "%{$q}%")
-                       ->orWhere('serial_number', 'like', "%{$q}%");
-                });
-            })
-            ->latest()
+            ->with('location')
+            ->filter($filters)
+            ->search($request->query('q'))
+            ->sort($request->query('sort_by'), $request->query('sort_dir'))
             ->paginate($perPage);
 
         return ApiResponse::success($sensors, 'Sensors fetched');
