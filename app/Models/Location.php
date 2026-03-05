@@ -11,4 +11,7 @@ class Location extends Model
     protected $fillable = [
         "name","building","floor","note"
     ];
+    public function sensors(){
+        return $this->hasMany(Sensor::class);
+    }
 }

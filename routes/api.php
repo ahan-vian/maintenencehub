@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\LocationController;
-
+use App\Http\Controllers\Api\SensorController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -27,3 +27,5 @@ Route::get('/health', function (){
     ]);
 });
 Route::apiResource('locations', LocationController::class);
+
+Route::apiResource('sensors', SensorController::class);

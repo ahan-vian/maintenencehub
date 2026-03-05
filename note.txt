@@ -1,0 +1,216 @@
+Roadmap 30 Hari (3–4 jam/hari)
+Minggu 1 — Fondasi Laravel + Database (Day 1–7)
+
+Day 1 — Setup & baseline
+
+Install: PHP, Composer, Laravel 10/11, MySQL, Postman
+
+Buat repo Git, commit awal, struktur branch (main/dev)
+
+Day 2 — Routing, Controller, Validation
+
+Resource routes
+
+Form Request validation (store/update)
+
+Standard JSON response (success/error)
+
+Day 3 — DB design (wajib rapi)
+
+Rancang ERD sederhana:
+
+users, roles (atau spatie), sensors, locations, calibrations
+
+Buat migrations + seeders + factories
+
+Day 4 — Eloquent relationship
+
+Sensor belongsTo Location
+
+Sensor hasMany Calibrations
+
+User hasMany Calibrations (technician)
+
+Eager loading untuk list API
+
+Day 5 — CRUD API “beneran”
+
+Sensors: create/list/detail/update/delete
+
+Pagination + filter (by location/status) + search (serial number)
+
+Day 6 — SQL & performa
+
+Hindari N+1 (with())
+
+Indexing kolom penting (serial_number, next_due_date)
+
+Latihan query: join / group / count
+
+Day 7 — Mini milestone
+
+API sensors + locations berjalan, rapih, tervalidasi
+
+README: cara run project + contoh endpoint
+
+Deliverable minggu 1: CRUD + relasi + pagination/filter + basic performance
+
+Minggu 2 — Auth, Role, Security, API Standard (Day 8–14)
+
+Day 8 — Auth API (Sanctum)
+
+Login, logout, token
+
+Middleware auth:sanctum untuk endpoint
+
+Day 9 — Authorization
+
+Policy untuk Sensor & Calibration (siapa boleh edit/hapus)
+
+Rule sederhana: teknisi hanya boleh input kalibrasi, admin boleh semuanya
+
+Day 10 — Role/Permission (Spatie)
+
+Role: admin, technician, viewer/manager
+
+Permission: sensors.read, sensors.manage, calibrations.create, reports.export
+
+Day 11 — File upload aman (opsional tapi nilai plus)
+
+Upload sertifikat kalibrasi (PDF)
+
+Validasi mime/size, simpan di storage, URL akses terproteksi
+
+Day 12 — API consistency
+
+API Resource (transformer)
+
+Error format konsisten (validation, unauthorized, not found)
+
+Day 13 — Rate limiting + security checklist
+
+Throttle untuk login
+
+Pastikan mass assignment aman (fillable/guarded)
+
+Pastikan endpoint delete tidak kebuka
+
+Day 14 — Mini milestone
+
+Auth + role permission + policy + API resource beres
+
+Deliverable minggu 2: auth token + RBAC + security & response standard
+
+Minggu 3 — Queue, Scheduler, Export, “Industrial Features” (Day 15–21)
+
+Day 15 — Konsep jadwal kalibrasi
+
+Field: last_calibrated_at, calibration_interval_days, next_due_date
+
+Update otomatis next_due_date saat kalibrasi baru dibuat
+
+Day 16 — Scheduler
+
+Command artisan: calibration:check-due
+
+Jalan harian via scheduler (cron concept)
+
+Tandai status: due_soon / overdue
+
+Day 17 — Queue + Notification
+
+Job: kirim notifikasi (email/log) untuk overdue
+
+Simpan notifikasi ke table (database notification) atau log dulu
+
+Day 18 — Laporan CSV
+
+Endpoint export CSV untuk “due list hari ini”
+
+Pastikan streaming response (biar aman untuk data besar)
+
+Day 19 — Audit trail
+
+Log aktivitas penting: create/update/delete sensor + create calibration
+
+Table activity_logs (user_id, action, entity, entity_id, meta)
+
+Day 20 — Caching
+
+Cache list locations / dashboard counts
+
+Cache invalidation saat ada perubahan data
+
+Day 21 — Mini milestone
+
+Scheduler + queue jalan
+
+Export CSV jalan
+
+Audit log ada
+
+Deliverable minggu 3: background tasks + export + audit + cache
+
+Minggu 4 — Testing, Refactor, Deploy-ready, Portfolio (Day 22–30)
+
+Day 22 — Testing setup
+
+Pest atau PHPUnit
+
+Feature test: auth required, validation error, create sensor success
+
+Day 23 — Test untuk role/permission
+
+Technician tidak boleh delete sensor
+
+Admin boleh delete
+
+Viewer hanya read
+
+Day 24 — Test untuk logic kalibrasi
+
+Create calibration → next_due_date berubah benar
+
+Overdue detection benar
+
+Day 25 — Refactor “service layer”
+
+Pindahkan logic berat ke Service classes
+
+Buat pattern: Controller tipis, Service tebal
+
+Day 26 — Error handling & logging
+
+Custom exception untuk business rules
+
+Log penting: failed job, export, due checker
+
+Day 27 — Docker / Sail (nilai plus)
+
+Minimal buat docker-compose untuk php+mysql (kalau kuat)
+
+Atau dokumentasikan requirements jelas
+
+Day 28 — Deployment checklist
+
+.env.example
+
+cache config/route di production (di README)
+
+storage link, permission
+
+Day 29 — Dokumentasi & API docs
+
+README: fitur, ERD (gambar), endpoint list, cara run
+
+Postman collection atau OpenAPI sederhana
+
+Day 30 — Final polish
+
+Buat “Dashboard endpoint”:
+
+total sensors, overdue count, due_soon count, latest calibrations
+
+Push repo public (atau private untuk lamaran) + 1 halaman portfolio singkat
+
+Deliverable minggu 4: tests + refactor + docs + deploy-ready + endpoint dashboard
