@@ -50,6 +50,7 @@ class SensorController extends Controller
 
     public function update(UpdateSensorRequest $request, Sensor $sensor)
     {
+        $this->authorize('update', $sensor);
         $data = $request->validated();
 
         if (!empty($data['last_calibrated_at'])) {
@@ -64,6 +65,7 @@ class SensorController extends Controller
 
     public function destroy(Sensor $sensor)
     {
+        $this->authorize('delete', $sensor);
         $sensor->delete();
         return ApiResponse::success(null, 'Sensor deleted');
     }
