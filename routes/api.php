@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Api\SensorController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\MeController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -32,4 +33,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/sensors', [SensorController::class, 'store'])->middleware('permission:sensors.manage');
     Route::put('/sensors/{sensor}', [SensorController::class, 'update'])->middleware('permission:sensors.manage');
     Route::delete('/sensors/{sensor}', [SensorController::class, 'destroy'])->middleware('permission:sensors.delete');
+});
+
+// Me endpoints
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/me/locations', [MeController::class, 'locations']);
+    Route::get('/me/sensors', [MeController::class, 'sensors']);
+});
+
+Route::middleware(['auth:sanctum', 'permission:locations.manage'])->group(function () {
+    Route::post('/locations/{location}/assign-technicians', [LocationController::class, 'assignTechnicians']);
 });

@@ -8,6 +8,8 @@ use App\Http\Requests\UpdateLocationRequest;
 use App\Models\Location;
 use App\Support\ApiResponse;
 use Illuminate\Http\Request;
+use App\Http\Requests\AssignTechniciansRequest;
+use App\Models\User;
 
 class LocationController extends Controller
 {
@@ -46,5 +48,25 @@ class LocationController extends Controller
         $location->delete();
 
         return ApiResponse::success(null, 'Location deleted', 200);
+    }
+    public function assignTechnicians(AssignTechniciansRequest $request, Location $location)
+    {
+        // hanya admin
+        abort_unless($request->user()->hasRole('admin'), 403, 'Forbidden');
+
+        $userIds = $request->validated()['user_ids'];
+
+        // (opsional) pastikan yang di-assign adalah technician
+        $techIds = User::query()
+            ->whereIn('id', $userIds)
+            ->whereHas('roles', fn($q) => $q->where('name', 'technician'))
+            ->pluck('id');
+
+        $location->technicians()->sync($techIds);
+
+        return ApiResponse::success(
+            $location->load('technicians'),
+            'Technicians assigned'
+        );
     }
 }
