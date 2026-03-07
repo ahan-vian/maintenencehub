@@ -33,6 +33,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/sensors', [SensorController::class, 'store'])->middleware('permission:sensors.manage');
     Route::put('/sensors/{sensor}', [SensorController::class, 'update'])->middleware('permission:sensors.manage');
     Route::delete('/sensors/{sensor}', [SensorController::class, 'destroy'])->middleware('permission:sensors.delete');
+    Route::patch('/sensors/{sensor}', [SensorController::class, 'patch'])
+    ->middleware('permission:sensors.manage');
 });
 
 // Me endpoints
