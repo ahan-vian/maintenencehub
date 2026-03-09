@@ -9,9 +9,20 @@ use App\Models\Sensor;
 use App\Support\ApiResponse;
 use Illuminate\Http\Request;
 use App\Http\Requests\PatchSensorRequest;
-
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Gate;
+use App\Services\SensorService;
+use App\Jobs\RecalculateSensorDueDate;
 class SensorController extends Controller
 {
+    protected SensorService $sensorService;
+
+    public function __construct(SensorService $sensorService)
+    {
+        $this->sensorService = $sensorService;
+    }
+
+
     public function index(Request $request)
     {
         $perPage = (int) $request->query('per_page', 10);
@@ -52,16 +63,18 @@ class SensorController extends Controller
     public function update(UpdateSensorRequest $request, Sensor $sensor)
     {
         $this->authorize('update', $sensor);
-        $data = $request->validated();
 
-        if (!empty($data['last_calibrated_at'])) {
-            $interval = $data['calibration_interval_days'] ?? $sensor->calibration_interval_days;
-            $data['next_due_date'] = now()->parse($data['last_calibrated_at'])->addDays($interval)->toDateString();
-        }
+        $data = $this->sensorService->preparePatchData(
+            $sensor,
+            $request->validated()
+        );
 
         $sensor->update($data);
 
-        return ApiResponse::success($sensor->fresh()->load('location'), 'Sensor updated');
+        return ApiResponse::success(
+            $sensor->fresh()->load('location'),
+            'Sensor updated'
+        );
     }
 
     public function destroy(Sensor $sensor)
@@ -70,29 +83,20 @@ class SensorController extends Controller
         $sensor->delete();
         return ApiResponse::success(null, 'Sensor deleted');
     }
-
     public function patch(PatchSensorRequest $request, Sensor $sensor)
     {
         $this->authorize('update', $sensor);
 
-        $data = $request->validated();
-
-        // kalau interval berubah tapi last_calibrated_at tidak dikirim, pakai existing last_calibrated_at
-        $last = array_key_exists('last_calibrated_at', $data) ? $data['last_calibrated_at'] : $sensor->last_calibrated_at;
-        $interval = array_key_exists('calibration_interval_days', $data) ? $data['calibration_interval_days'] : $sensor->calibration_interval_days;
-
-        // next_due_date dihitung kalau punya last date (baik existing atau new)
-        if (!empty($last)) {
-            $data['next_due_date'] = now()->parse($last)->addDays((int) $interval)->toDateString();
-        } else {
-            // kalau last_calibrated_at di-patch jadi null, due date juga null
-            if (array_key_exists('last_calibrated_at', $data) && $data['last_calibrated_at'] === null) {
-                $data['next_due_date'] = null;
-            }
-        }
+        $data = $this->sensorService->preparePatchData(
+            $sensor,
+            $request->validated()
+        );
 
         $sensor->update($data);
 
-        return ApiResponse::success($sensor->fresh()->load('location'), 'Sensor patched');
+        return ApiResponse::success(
+            $sensor->fresh()->load('location'),
+            'Sensor patched'
+        );
     }
 }
