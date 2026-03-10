@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Gate;
 use App\Services\SensorService;
 use App\Jobs\RecalculateSensorDueDate;
 use App\Jobs\LogSensorPatched;
+use App\Events\SensorPatched;
 
 class SensorController extends Controller
 {
@@ -96,13 +97,13 @@ class SensorController extends Controller
 
         $sensor->update($data);
 
-        LogSensorPatched::dispatch(
+        SensorPatched::dispatch(
+            $sensor->fresh()->load('location'),
             auth()->id(),
-            $sensor->id,
             $data
         );
 
-        return \App\Support\ApiResponse::success(
+        return ApiResponse::success(
             $sensor->fresh()->load('location'),
             'Sensor patched'
         );
