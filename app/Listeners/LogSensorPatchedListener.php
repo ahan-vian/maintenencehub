@@ -6,6 +6,8 @@ use App\Events\SensorPatched;
 use App\Models\ActivityLog;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use App\Models\User;
+use App\Notifications\SensorPatchedNotification;
 
 class LogSensorPatchedListener implements ShouldQueue
 {
@@ -16,7 +18,6 @@ class LogSensorPatchedListener implements ShouldQueue
 
     public function handle(SensorPatched $event): void
     {
-        throw new \Exception('Simulated queue failure for testing');
         ActivityLog::create([
             'user_id' => $event->userId,
             'action' => 'sensor.patched',
@@ -24,6 +25,19 @@ class LogSensorPatchedListener implements ShouldQueue
             'entity_id' => $event->sensor->id,
             'meta' => $event->changes,
         ]);
+
+        // contoh sederhana: kirim notifikasi ke semua admin
+        $admins = User::role('admin')->get();
+
+        foreach ($admins as $admin) {
+            $admin->notify(
+                new SensorPatchedNotification(
+                    $event->sensor,
+                    $event->changes,
+                    $event->userId
+                )
+            );
+        }
     }
 
     public function failed(SensorPatched $event, \Throwable $exception): void

@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\Api\SensorController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\MeController;
+use App\Http\Controllers\Api\NotificationController;
 
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -34,7 +35,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/sensors/{sensor}', [SensorController::class, 'update'])->middleware('permission:sensors.manage');
     Route::delete('/sensors/{sensor}', [SensorController::class, 'destroy'])->middleware('permission:sensors.delete');
     Route::patch('/sensors/{sensor}', [SensorController::class, 'patch'])
-    ->middleware('permission:sensors.manage');
+        ->middleware('permission:sensors.manage');
+    Route::get('/notifications', [NotificationController::class, 'index']);
+    Route::get('/notifications/unread', [NotificationController::class, 'unread']);
+    Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
 });
 
 // Me endpoints
